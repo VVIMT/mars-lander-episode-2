@@ -73,9 +73,9 @@ def control_acceleration(params, landing_phase):
     if x > landing_site_coords[0] - params["flat_surface_len"]//2 \
         and x < landing_site_coords[0] + params["flat_surface_len"]//2 \
         and params["h_speed"] >= -1 and params["h_speed"] <= 1:
-        landing_phase = 2 # Land vertically
+        landing_phase = 2 # Land vertically when the shuttle is over the flat landing site.
     else:
-        landing_phase = 1
+        landing_phase = 1 # Move horizontally when the shuttle is not over the flat landing site.
 
     print("landing_phase = " + str(abs(landing_phase)), file=sys.stderr, flush=True)
     # The "objective" is a straight line
@@ -97,7 +97,7 @@ def control_acceleration(params, landing_phase):
     braking_distance = compute_braking_distance(speed, max_acceleration, landing_phase)
     # Variable "approach" takes value "1" when the shuttle is approaching the objective, 
     # "-1" when the shuttle is moving away from the objective, and "0" when it is static.
-    if approach != -1:
+    if approach != -1: # Shuttle approaching the objective.
         power = 4
         rotate = math.degrees(math.acos(3.711/4))
         if x < objective and landing_phase == 1:
@@ -123,7 +123,7 @@ def control_acceleration(params, landing_phase):
                 power = 0
             else:
                 power = 4
-    else: # Takes value 
+    else: # Shuttle moving away from the objective.
         rotate = math.degrees(math.acos(3.711/4))
         if x < objective and landing_phase == 1:
             rotate *= -1
