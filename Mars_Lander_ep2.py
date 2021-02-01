@@ -24,13 +24,7 @@ def find_landing_site(lst_land_x, lst_land_y):
 
     return (flat_surface_len, landing_site_coords)
 
-flat_surface_len, landing_site_coords = find_landing_site(lst_land_x, lst_land_y)
-
 def control_acceleration(params, landing_phase, rotate, power):
-    """
-    We compute the desired acceleration according to the speed and 
-    the distance of the space shuttle compared with the landing site position.
-    """
 
     landing_phase = 1 # Move horizontally when the shuttle is not over the flat landing site.
     position = x
@@ -49,6 +43,7 @@ def control_acceleration(params, landing_phase, rotate, power):
     # We compute the distance required to stop the space shuttle 
     # given its speed and maximum thrust power of deceleration.
     braking_distance = (-pow(speed, 2)) / (2 * -abs(max_acceleration))
+
     if landing_phase == 1:
         rotate = math.degrees(math.acos(3.711/4))
         if x < landing_site_coords[0]:
@@ -58,7 +53,8 @@ def control_acceleration(params, landing_phase, rotate, power):
             rotate *= 1
             power = 4
         if braking_distance >= objective_distance and \
-            (speed > 0 and x < landing_site_coords[0] or speed < 0 and x > landing_site_coords[0]):
+            (speed > 0 and x < landing_site_coords[0] or \
+                speed < 0 and x > landing_site_coords[0]):
             rotate *= -1
         elif objective_distance > flat_surface_len \
             and y < landing_site_coords[1] + abs(3000 - landing_site_coords[1])//2:
@@ -79,8 +75,11 @@ landing_phase = 1
 while True:
     x, y, h_speed, v_speed, fuel, rotate, power = [int(i) for i in input().split()]
     
-    params = {"x": x, "y": y, "landing_site_coords": landing_site_coords, "flat_surface_len": flat_surface_len, \
-            "h_speed": h_speed, "v_speed": v_speed, "rotate": rotate, "power": power}
+    flat_surface_len, landing_site_coords = find_landing_site(lst_land_x, lst_land_y)
+
+    params = {"x": x, "y": y, "landing_site_coords": landing_site_coords, \
+        "flat_surface_len": flat_surface_len, "h_speed": h_speed, \
+            "v_speed": v_speed, "rotate": rotate, "power": power}
 
     rotate, power, landing_phase = control_acceleration(params, landing_phase, rotate, power)
     print(str(rotate) + " " + str(power))
