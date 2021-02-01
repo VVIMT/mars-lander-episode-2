@@ -44,7 +44,7 @@ flat_surface_len, flat_surface_coords, landing_site_coords = find_landing_site(l
 
 def compute_braking_distance(speed, acceleration, landing_phase):
     '''
-    Calculate the distance required to stop the space shuttle \
+    Calculate the distance required to stop the space shuttle
     given its speed and maximum thrust power of deceleration.
     '''
     
