@@ -26,50 +26,35 @@ def find_landing_site(lst_land_x, lst_land_y):
 
 flat_surface_len, landing_site_coords = find_landing_site(lst_land_x, lst_land_y)
 
-def compute_braking_distance(speed, acceleration, landing_phase):
-    '''
-    We compute the distance required to stop the space shuttle
-    given its speed and maximum thrust power of deceleration.
-    '''
-
-    final_speed = 0
-    if landing_phase == 2:
-        final_speed = 20
-    braking_distance = (pow(final_speed, 2) - pow(speed, 2)) / (2 * -abs(acceleration))
-
-    return (braking_distance)
-
 def control_acceleration(params, landing_phase, rotate, power):
     """
     We compute the desired acceleration according to the speed and 
     the distance of the space shuttle compared with the landing site position.
     """
 
-    objective_distance = 0
     landing_phase = 1 # Move horizontally when the shuttle is not over the flat landing site.
     position = x
     speed = params["h_speed"]
-    objective = landing_site_coords[0]
-    objective_distance = abs(objective - position)
+    objective_distance = abs(landing_site_coords[0] - position)
     max_acceleration = abs(4 * math.sin(math.acos(3.711/4)))
     if x > landing_site_coords[0] - params["flat_surface_len"]//2 \
         and x < landing_site_coords[0] + params["flat_surface_len"]//2 \
-        and params["h_speed"] >= -1 and params["h_speed"] <= 1:
+        and params["h_speed"] >= -5 and params["h_speed"] <= 5:
         landing_phase = 2 # Land vertically when the shuttle is over the flat landing site.
         position = y
         speed = params["v_speed"]
-        objective = landing_site_coords[1]
-        objective_distance = abs(objective - position)
+        objective_distance = abs(landing_site_coords[1] - position)
         max_acceleration = 4 - 3.711
     
-    braking_distance = compute_braking_distance(speed, max_acceleration, landing_phase)
-
+    # We compute the distance required to stop the space shuttle 
+    # given its speed and maximum thrust power of deceleration.
+    braking_distance = (-pow(speed, 2)) / (2 * -abs(max_acceleration))
     if landing_phase == 1:
         rotate = math.degrees(math.acos(3.711/4))
-        if x < objective:
+        if x < landing_site_coords[0]:
             rotate *= -1
             power = 4
-        elif x > objective:
+        elif x > landing_site_coords[0]:
             rotate *= 1
             power = 4
         if braking_distance >= objective_distance and \
