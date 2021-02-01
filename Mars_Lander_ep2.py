@@ -44,25 +44,24 @@ flat_surface_len, flat_surface_coords, landing_site_coords = find_landing_site(l
 
 def compute_braking_distance(speed, acceleration, landing_phase):
     '''
-    Calculate the distance required to stop the space shuttle
+    We compute the distance required to stop the space shuttle
     given its speed and maximum thrust power of deceleration.
     '''
-    
-    if landing_phase == 2 and abs(speed) > 5:
-        speed = abs(speed) - 5
-    time = abs(speed)/abs(acceleration)
-    braking_distance = abs(abs(speed) * time + 1/2 * -abs(acceleration) * pow(time, 2))
+
+    final_speed = 0
+    if landing_phase == 2:
+        final_speed = 20
+    braking_distance = (pow(final_speed, 2) - pow(speed, 2)) / (2 * -abs(acceleration))
 
     print("speed = " + str(abs(speed)), file=sys.stderr, flush=True)
     print("acceleration = " + str(abs(acceleration)), file=sys.stderr, flush=True)
-    print("time = " + str(abs(time)), file=sys.stderr, flush=True)
     print("braking_distance = " + str(abs(braking_distance)), file=sys.stderr, flush=True)
 
     return (braking_distance)
 
 def control_acceleration(params, landing_phase):
     """
-    We calculate the desired acceleration according to the speed and 
+    We compute the desired acceleration according to the speed and 
     the distance of the space shuttle compared with the landing site position.
     """
 
