@@ -95,8 +95,8 @@ def control_acceleration(params, landing_phase):
         max_acceleration = 4 - 3.711
     
     braking_distance = compute_braking_distance(speed, max_acceleration, landing_phase)
-
-    if approach != -1: # Takes value "1" when the shuttle is approaching the objective.
+    # Variable "approach" takes value "1" when the shuttle is approaching the objective, "-1" when the shuttle is moving away from the objective, and "0" when it is static.
+    if approach != -1:
         power = 4
         rotate = math.degrees(math.acos(3.711/4))
         if x < objective and landing_phase == 1:
@@ -122,7 +122,7 @@ def control_acceleration(params, landing_phase):
                 power = 0
             else:
                 power = 4
-    else: # Takes value "-1" when the shuttle is moving away from the objective, and "0" when it is static
+    else: # Takes value 
         rotate = math.degrees(math.acos(3.711/4))
         if x < objective and landing_phase == 1:
             rotate *= -1
