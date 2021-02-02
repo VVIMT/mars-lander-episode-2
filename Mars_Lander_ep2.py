@@ -33,7 +33,7 @@ def control_acceleration(params, landing_phase, rotate, power):
     max_acceleration = abs(4 * math.sin(math.acos(3.711/4)))
     if x > landing_site_coords[0] - params["flat_surface_len"]//2 \
         and x < landing_site_coords[0] + params["flat_surface_len"]//2 \
-        and params["h_speed"] >= -5 and params["h_speed"] <= 5:
+        and abs(speed) <= 5:
         landing_phase = 2 # Land vertically when the shuttle is over the flat landing site.
         position = y
         speed = params["v_speed"]
@@ -77,9 +77,15 @@ while True:
     
     flat_surface_len, landing_site_coords = find_landing_site(lst_land_x, lst_land_y)
 
-    params = {"x": x, "y": y, "landing_site_coords": landing_site_coords, \
-        "flat_surface_len": flat_surface_len, "h_speed": h_speed, \
-            "v_speed": v_speed, "rotate": rotate, "power": power}
+    params = {}
+    params["x"] = x
+    params["y"] = y
+    params["landing_site_coords"] = landing_site_coords
+    params["flat_surface_len"] = flat_surface_len
+    params["h_speed"] = h_speed
+    params["v_speed"] = v_speed
+    params["rotate"] = rotate
+    params["power"] = power
 
     rotate, power, landing_phase = control_acceleration(params, landing_phase, rotate, power)
     print(str(rotate) + " " + str(power))
