@@ -44,7 +44,7 @@ def control_acceleration(params, landing_step, rotate, power):
     
     # We compute the distance required to stop the space shuttle 
     # given its speed and maximum thrust power of deceleration.
-    braking_distance = (-pow(speed, 2)) / (2 * -abs(max_acceleration))
+    braking_distance = 3*abs(speed) + (-pow(speed, 2)) / (2 * -abs(max_acceleration))
 
     if landing_step == 1:
         rotate = degrees(acos(3.711/4))
