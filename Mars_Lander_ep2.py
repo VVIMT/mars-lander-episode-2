@@ -26,9 +26,9 @@ def find_landing_site(lst_land_x, lst_land_y):
 
     return (flat_surface_len, landing_site)
 
-def control_acceleration(params, landing_phase, rotate, power):
+def control_acceleration(params, landing_step, rotate, power):
 
-    landing_phase = 1 # Move horizontally when the shuttle is not over the flat landing site.
+    landing_step = 1 # Move horizontally when the shuttle is not over the flat landing site.
     position = x
     speed = params["h_speed"]
     objective_distance = abs(landing_site["x"] - position)
@@ -36,7 +36,7 @@ def control_acceleration(params, landing_phase, rotate, power):
     if x > landing_site["x"] - params["flat_surface_len"]//2 \
         and x < landing_site["x"] + params["flat_surface_len"]//2 \
         and abs(speed) <= 5:
-        landing_phase = 2 # Land vertically when the shuttle is over the flat landing site.
+        landing_step = 2 # Land vertically when the shuttle is over the flat landing site.
         position = y
         speed = params["v_speed"]
         objective_distance = abs(landing_site["y"] - position)
@@ -46,7 +46,7 @@ def control_acceleration(params, landing_phase, rotate, power):
     # given its speed and maximum thrust power of deceleration.
     braking_distance = (-pow(speed, 2)) / (2 * -abs(max_acceleration))
 
-    if landing_phase == 1:
+    if landing_step == 1:
         rotate = degrees(acos(3.711/4))
         if x < landing_site["x"]:
             rotate *= -1
@@ -63,16 +63,16 @@ def control_acceleration(params, landing_phase, rotate, power):
             rotate = 0
             if params["v_speed"] < 0:
                 power = 4
-    elif landing_phase == 2:
+    elif landing_step == 2:
         rotate = 0
         if braking_distance < objective_distance:
             power = 0
         else:
             power = 4
 
-    return (round(rotate), power, landing_phase)
+    return (round(rotate), power, landing_step)
 
-landing_phase = 1
+landing_step = 1
 # game loop
 while True:
     x, y, h_speed, v_speed, fuel, rotate, power = [int(i) for i in input().split()]
@@ -89,5 +89,5 @@ while True:
     params["rotate"] = rotate
     params["power"] = power
 
-    rotate, power, landing_phase = control_acceleration(params, landing_phase, rotate, power)
+    rotate, power, landing_step = control_acceleration(params, landing_step, rotate, power)
     print(str(rotate) + " " + str(power))
