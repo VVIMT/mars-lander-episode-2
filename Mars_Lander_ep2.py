@@ -1,5 +1,5 @@
 import sys
-import math
+from math import degrees, radians, cos, sin, acos, asin, hypot
 
 surface_n = int(input())  # the number of points used to draw the surface of Mars.
 lst_land_x = []
@@ -13,6 +13,7 @@ for i in range(surface_n):
 
 def find_landing_site(lst_land_x, lst_land_y):
 
+    landing_site = {}
     flat_surface_len = 0
     for i in range(len(lst_land_x) - 1):
         j = i + 1
@@ -20,24 +21,25 @@ def find_landing_site(lst_land_x, lst_land_y):
             j += 1
         if not (lst_land_x[j - 1] - lst_land_x[i] < 1000):
             flat_surface_len = lst_land_x[j - 1] - lst_land_x[i]
-            landing_site_coords = [lst_land_x[i] + flat_surface_len//2, lst_land_y[i]]
+            landing_site["x"] = lst_land_x[i] + flat_surface_len//2
+            landing_site["y"] = lst_land_y[i]
 
-    return (flat_surface_len, landing_site_coords)
+    return (flat_surface_len, landing_site)
 
 def control_acceleration(params, landing_phase, rotate, power):
 
     landing_phase = 1 # Move horizontally when the shuttle is not over the flat landing site.
     position = x
     speed = params["h_speed"]
-    objective_distance = abs(landing_site_coords[0] - position)
-    max_acceleration = abs(4 * math.sin(math.acos(3.711/4)))
-    if x > landing_site_coords[0] - params["flat_surface_len"]//2 \
-        and x < landing_site_coords[0] + params["flat_surface_len"]//2 \
+    objective_distance = abs(landing_site["x"] - position)
+    max_acceleration = abs(4 * sin(acos(3.711/4)))
+    if x > landing_site["x"] - params["flat_surface_len"]//2 \
+        and x < landing_site["x"] + params["flat_surface_len"]//2 \
         and abs(speed) <= 5:
         landing_phase = 2 # Land vertically when the shuttle is over the flat landing site.
         position = y
         speed = params["v_speed"]
-        objective_distance = abs(landing_site_coords[1] - position)
+        objective_distance = abs(landing_site["y"] - position)
         max_acceleration = 4 - 3.711
     
     # We compute the distance required to stop the space shuttle 
@@ -45,19 +47,19 @@ def control_acceleration(params, landing_phase, rotate, power):
     braking_distance = (-pow(speed, 2)) / (2 * -abs(max_acceleration))
 
     if landing_phase == 1:
-        rotate = math.degrees(math.acos(3.711/4))
-        if x < landing_site_coords[0]:
+        rotate = degrees(acos(3.711/4))
+        if x < landing_site["x"]:
             rotate *= -1
             power = 4
-        elif x > landing_site_coords[0]:
+        elif x > landing_site["x"]:
             rotate *= 1
             power = 4
         if braking_distance >= objective_distance and \
-            (speed > 0 and x < landing_site_coords[0] or \
-                speed < 0 and x > landing_site_coords[0]):
+            (speed > 0 and x < landing_site["x"] or \
+                speed < 0 and x > landing_site["x"]):
             rotate *= -1
-        elif objective_distance > flat_surface_len \
-            and y < landing_site_coords[1] + abs(3000 - landing_site_coords[1])//2:
+        elif objective_distance > flat_surface_len//2 \
+            and y < landing_site["y"] + abs(3000 - landing_site["y"])//2:
             rotate = 0
             if params["v_speed"] < 0:
                 power = 4
@@ -75,12 +77,12 @@ landing_phase = 1
 while True:
     x, y, h_speed, v_speed, fuel, rotate, power = [int(i) for i in input().split()]
     
-    flat_surface_len, landing_site_coords = find_landing_site(lst_land_x, lst_land_y)
+    flat_surface_len, landing_site = find_landing_site(lst_land_x, lst_land_y)
 
     params = {}
     params["x"] = x
     params["y"] = y
-    params["landing_site_coords"] = landing_site_coords
+    params["landing_site"] = landing_site
     params["flat_surface_len"] = flat_surface_len
     params["h_speed"] = h_speed
     params["v_speed"] = v_speed
