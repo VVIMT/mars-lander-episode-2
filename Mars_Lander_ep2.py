@@ -1,15 +1,22 @@
 import sys
 from math import degrees, radians, cos, sin, acos, asin, hypot
+import numpy as np
 
-surface_n = int(input())  # the number of points used to draw the surface of Mars.
-lst_land_x = []
-lst_land_y = []
 
-for i in range(surface_n):
-    land_x, land_y = [int(j) for j in input().split()]
+def map_input():
 
-    lst_land_x.append(land_x)
-    lst_land_y.append(land_y)
+    surface_n = int(input())  # Number of points to draw the surface of Mars.
+    lst_land_x = []
+    lst_land_y = []
+
+    for i in range(surface_n):
+        land_x, land_y = [int(j) for j in input().split()]
+
+        lst_land_x.append(land_x)
+        lst_land_y.append(land_y)
+
+    return (lst_land_x, lst_land_y)
+
 
 def find_landing_site(lst_land_x, lst_land_y):
 
@@ -26,25 +33,28 @@ def find_landing_site(lst_land_x, lst_land_y):
 
     return (flat_surface_len, landing_site)
 
+
 def control_acceleration(params, landing_step, rotate, power):
 
-    landing_step = 1 # Move horizontally when the shuttle is not over the flat landing site.
+    landing_step = 1  # Move horizontally over the landing site.
     position = x
     speed = params["h_speed"]
     objective_distance = abs(landing_site["x"] - position)
-    max_acceleration = abs(4 * sin(acos(3.711/4)))
+    max_deceleration = abs(4 * sin(acos(3.711/4)))
+    #max_deceleration = 4
     if x > landing_site["x"] - params["flat_surface_len"]//2 \
-        and x < landing_site["x"] + params["flat_surface_len"]//2 \
-        and abs(speed) <= 5:
-        landing_step = 2 # Land vertically when the shuttle is over the flat landing site.
+            and x < landing_site["x"] + params["flat_surface_len"]//2 \
+            and abs(speed) <= 5:
+        landing_step = 2  # Land vertically when over the landing site.
         position = y
         speed = params["v_speed"]
         objective_distance = abs(landing_site["y"] - position)
-        max_acceleration = 4 - 3.711
-    
-    # We compute the distance required to stop the space shuttle 
+        #max_acceleration = 4 - 3.711
+        max_deceleration = 4 - 3.711
+
+    # We compute the distance required to stop the space shuttle
     # given its speed and maximum thrust power of deceleration.
-    braking_distance = 3*abs(speed) + (-pow(speed, 2)) / (2 * -abs(max_acceleration))
+    braking_distance = 3 * abs(speed) + (-pow(speed, 2)) / (2 * -abs(max_deceleration))
 
     if landing_step == 1:
         rotate = degrees(acos(3.711/4))
@@ -54,12 +64,13 @@ def control_acceleration(params, landing_step, rotate, power):
         elif x > landing_site["x"]:
             rotate *= 1
             power = 4
-        if braking_distance >= objective_distance and \
-            (speed > 0 and x < landing_site["x"] or \
-                speed < 0 and x > landing_site["x"]):
+        if braking_distance >= objective_distance \
+                and (speed > 0 and x < landing_site["x"] \
+                or speed < 0 and x > landing_site["x"]):
+            #rotate = -1 * np.sign(rotate) * 90
             rotate *= -1
         elif objective_distance > flat_surface_len//2 \
-            and y < landing_site["y"] + abs(3000 - landing_site["y"])//2:
+                and y < landing_site["y"] + abs(3000 - landing_site["y"])//2:
             rotate = 0
             if params["v_speed"] < 0:
                 power = 4
@@ -72,22 +83,28 @@ def control_acceleration(params, landing_step, rotate, power):
 
     return (round(rotate), power, landing_step)
 
+lst_land_x, lst_land_y = map_input()
+flat_surface_len, landing_site = find_landing_site(lst_land_x, lst_land_y)
+
 landing_step = 1
 # game loop
 while True:
     x, y, h_speed, v_speed, fuel, rotate, power = [int(i) for i in input().split()]
-    
-    flat_surface_len, landing_site = find_landing_site(lst_land_x, lst_land_y)
 
-    params = {}
-    params["x"] = x
-    params["y"] = y
-    params["landing_site"] = landing_site
-    params["flat_surface_len"] = flat_surface_len
-    params["h_speed"] = h_speed
-    params["v_speed"] = v_speed
-    params["rotate"] = rotate
-    params["power"] = power
+    params = {
+                "x": x,
+                "y": y,
+                "landing_site": landing_site,
+                "flat_surface_len": flat_surface_len,
+                "h_speed": h_speed,
+                "v_speed": v_speed,
+                "rotate": rotate,
+                "power": power
+             }
 
-    rotate, power, landing_step = control_acceleration(params, landing_step, rotate, power)
-    print(str(rotate) + " " + str(power))
+    rotate, power, landing_step = control_acceleration(params,
+                                                       landing_step,
+                                                       rotate,
+                                                       power)
+
+    print(str(int(rotate)) + " " + str(power))
