@@ -50,8 +50,8 @@ def control_acceleration(p, landing_stage, rotate, power):
         left_time_to_land = abs(landing_site["y"] - y) / abs(p["v_speed"])
 
     if (abs(speed) <= 3 or left_time_to_land <= 6) \
-            and x >= landing_site["x"] - p["flat_surface_len"] // 2 \
-            and x <= landing_site["x"] + p["flat_surface_len"] // 2:
+            and x >= landing_site["x"] - p["flat_surface_len"] // 3 \
+            and x <= landing_site["x"] + p["flat_surface_len"] // 3:
         landing_stage = 2  # Land vertically when over the landing site.
         brake_angle = 0
         max_deceleration = 4 - 3.711
