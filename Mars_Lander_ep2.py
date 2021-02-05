@@ -112,6 +112,6 @@ while True:
                                                             landing_stage,
                                                             rotate,
                                                             power
-                                                        )
+                                                       )
 
     print(str(int(rotate)) + " " + str(power))
