@@ -41,8 +41,8 @@ def control_acceleration(p, landing_stage, rotate, power):
 
     brake_angle = abs(degrees(acos(3.711 / 4)))
     if hypot(p["h_speed"], p["v_speed"]) > 0:
-        radian_angle = abs(p["h_speed"] / hypot(p["h_speed"], p["v_speed"]))
-        brake_angle = copysign(1, speed) * (degrees(asin(radian_angle)))
+        radian_angle = asin(abs(p["h_speed"] / hypot(p["h_speed"], p["v_speed"])))
+        brake_angle = copysign(1, speed) * (degrees(radian_angle))
     max_deceleration = abs(4 * sin(brake_angle))
 
     left_time_to_land = 7
